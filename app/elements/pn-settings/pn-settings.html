@@ -83,6 +83,8 @@
                         /*
                          * the subscription was successful
                          */
+                        console.log('Subscribe', subscription);
+
                         isPushEnabled = true;
                         self.$.pushToggle.querySelector('.toggle-label').innerText = DISABLE_PUSH_MESSAGES_TEXT;
                         self.$.pushToggle.disabled = false;
@@ -134,7 +136,7 @@
                             return;
                         }
 
-                        var subscriptionId = subscription.subscriptionId;
+                        console.log('Unsubscribe', subscription);
 
                         /*
                          * make a request to the server to remove the subscriptionId
