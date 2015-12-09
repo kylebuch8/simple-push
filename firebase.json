@@ -1,0 +1,9 @@
+{
+  "firebase": "simplepush",
+  "public": "dist",
+  "ignore": [
+    "firebase.json",
+    "**/.*",
+    "**/node_modules/**"
+  ]
+}
