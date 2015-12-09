@@ -1,0 +1,9 @@
+{
+    "name": "Simple Push",
+    "short_name": "Simple Push",
+    "icons": [{
+        "src": "images/touch/chrome-touch-icon-192x192.png",
+        "sizes": "192x192"
+    }],
+    "gcm_sender_id": "432602237067"
+}

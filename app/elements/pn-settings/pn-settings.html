@@ -1,0 +1,167 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/paper-toggle-button/paper-toggle-button.html">
+
+<dom-module is="pn-settings">
+    <template>
+        <div class="content">
+            <h1>Settings</h1>
+            <paper-toggle-button id="pushToggle" disabled on-change="toggleSubscription">Enable Push Notifications</paper-toggle-button>
+            <template is="dom-if" if="[[pushNotificationsUnsupported]]">
+                <p class="text-muted"><small>Push Notifications are not supported in this browser.</small></p>
+            </template>
+        </div>
+    </template>
+</dom-module>
+
+<script>
+
+    (function () {
+        'use strict';
+
+        var ENABLE_PUSH_MESSAGES_TEXT = 'Enable Push Notifications';
+        var DISABLE_PUSH_MESSAGES_TEXT = 'Disable Push Notifications';
+        var isPushEnabled = false;
+
+        Polymer({
+            is: 'pn-settings',
+            properties: {
+                pushNotificationsUnsupported: {
+                    type: Boolean,
+                    value: false
+                }
+            },
+            ready: function () {
+                var self = this;
+
+                if ('serviceWorker' in navigator) {
+                    if (!('showNotification' in ServiceWorkerRegistration.prototype)) {
+                        console.warn('Notifications aren\'t supported.');
+                        return;
+                    }
+
+                    if (Notification.permission === 'denied') {
+                        console.warn('The user has blocked notifications');
+                        return;
+                    }
+
+                    if (!('PushManager' in window)) {
+                        console.warn('Push Messaging isn\'t supported.');
+                        return;
+                    }
+
+                    navigator.serviceWorker.ready.then(function (serviceWorkerRegistration) {
+                        serviceWorkerRegistration.pushManager.getSubscription().then(function (subscription) {
+                            self.$.pushToggle.disabled = false;
+
+                            if (!subscription) {
+                                return;
+                            }
+
+                            isPushEnabled = true;
+                            self.$.pushToggle.querySelector('.toggle-label').innerText = DISABLE_PUSH_MESSAGES_TEXT;
+                            self.$.pushToggle.checked = true;
+                        });
+                    });
+                } else {
+                    this.pushNotificationsUnsupported = true;
+                }
+            },
+            toggleSubscription: function () {
+                if (isPushEnabled) {
+                    this.unsubscribe();
+                } else {
+                    this.subscribe();
+                }
+            },
+            subscribe: function () {
+                var self = this;
+
+                self.$.pushToggle.disabled = true;
+
+                navigator.serviceWorker.ready.then(function (serviceWorkerRegistration) {
+                    serviceWorkerRegistration.pushManager.subscribe({ userVisibleOnly: true }).then(function (subscription) {
+                        /*
+                         * the subscription was successful
+                         */
+                        isPushEnabled = true;
+                        self.$.pushToggle.querySelector('.toggle-label').innerText = DISABLE_PUSH_MESSAGES_TEXT;
+                        self.$.pushToggle.disabled = false;
+
+                        /*
+                         * send the subscription to the server and save it to send
+                         * a push notification at a later date
+                         */
+                        // return sendSubscriptionToServer(subscription);
+                    }).catch(function (e) {
+                        if (Notification.permission === 'denied') {
+                            /*
+                             * the user denied the notification permission which
+                             * means we failed to subscribe and the user will need
+                             * to manually change the notification permission to
+                             * subscribe to push notifications
+                             */
+                            console.warn('Permission for Notifications was denied.');
+                            self.$.pushToggle.disabled = true;
+                        } else {
+                            /*
+                             * a problem occurred with the subscription; common reasons
+                             * include network errors, lacking gcm_sender_id and/or
+                             * gcm_user_visible_only in the manifest
+                             */
+                            console.error('Unable to subscribe to push.', e);
+                            self.$.pushToggle.disabled = false;
+                            self.$.pushToggle.active = false;
+                            self.$.pushToggle.querySelector('.toggle-label').innerText = ENABLE_PUSH_MESSAGES_TEXT;
+                        }
+                    });
+                })
+            },
+            unsubscribe: function () {
+                var self = this;
+
+                self.$.pushToggle.disabled = true;
+
+                navigator.serviceWorker.ready.then(function (serviceWorkerRegistration) {
+                    serviceWorkerRegistration.pushManager.getSubscription().then(function (subscription) {
+                        if (!subscription) {
+                            /*
+                             * No subscription object so set the state to allow
+                             * the user to subscribe to push notifications
+                             */
+                            isPushEnabled = false;
+                            self.$.pushToggle.disabled = false;
+                            self.$.pushToggle.querySelector('.toggle-label').innerText = ENABLE_PUSH_MESSAGES_TEXT;
+                            return;
+                        }
+
+                        var subscriptionId = subscription.subscriptionId;
+
+                        /*
+                         * make a request to the server to remove the subscriptionId
+                         * from the database which will prevent us from sending
+                         * messages to a user who has unsubscribed
+                         */
+                        // sendUnsubscribeToServer(subscription);
+
+                        /*
+                         * we have a subscription so call unsubscribe on it
+                         */
+                        subscription.unsubscribe().then(function (successful) {
+                            self.$.pushToggle.disabled = false;
+                            self.$.pushToggle.querySelector('.toggle-label').innerText = ENABLE_PUSH_MESSAGES_TEXT;
+                            isPushEnabled = false;
+                        }).catch(function (e) {
+                            console.error('Unsubscription error: ', e);
+                            self.$.pushToggle.disabled = false;
+                            self.$.pushToggle.querySelector('.toggle-label').innerText = ENABLE_PUSH_MESSAGES_TEXT;
+                            self.$.pushToggle.active = false;
+                        });
+                    }).catch(function (e) {
+                        console.error('Error thrown while unsubscribing from push notifications.', e);
+                    });
+                });
+            }
+        });
+    }());
+
+</script>

@@ -1,0 +1,29 @@
+{
+  "name": "simple-push",
+  "description": "",
+  "main": "index.js",
+  "authors": [
+    "Kyle Buchanan <kylebuch8@gmail.com>"
+  ],
+  "license": "ISC",
+  "moduleType": [],
+  "homepage": "",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "polymer": "Polymer/polymer#^1.2.0",
+    "page": "visionmedia/page.js#~1.6.3",
+    "paper-drawer-panel": "PolymerElements/paper-drawer-panel#~1.0.5",
+    "paper-toolbar": "PolymerElements/paper-toolbar#~1.1.2",
+    "paper-icon-button": "PolymerElements/paper-icon-button#~1.0.5",
+    "paper-menu": "PolymerElements/paper-menu#~1.2.0",
+    "neon-animation": "PolymerElements/neon-animation#~1.0.8",
+    "paper-toggle-button": "PolymerElements/paper-toggle-button#~1.0.11",
+    "paper-scroll-header-panel": "PolymerElements/paper-scroll-header-panel#~1.0.12"
+  }
+}
