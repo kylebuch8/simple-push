@@ -116,7 +116,7 @@
                             self.$.pushToggle.querySelector('.toggle-label').innerText = ENABLE_PUSH_MESSAGES_TEXT;
                         }
                     });
-                })
+                });
             },
             unsubscribe: function () {
                 var self = this;
@@ -148,7 +148,7 @@
                         /*
                          * we have a subscription so call unsubscribe on it
                          */
-                        subscription.unsubscribe().then(function (successful) {
+                        subscription.unsubscribe().then(function () {
                             self.$.pushToggle.disabled = false;
                             self.$.pushToggle.querySelector('.toggle-label').innerText = ENABLE_PUSH_MESSAGES_TEXT;
                             isPushEnabled = false;
