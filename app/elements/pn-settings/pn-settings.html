@@ -35,6 +35,7 @@
 
                 if ('serviceWorker' in navigator) {
                     if (!('showNotification' in ServiceWorkerRegistration.prototype)) {
+                        this.pushNotificationsUnsupported = true;
                         console.warn('Notifications aren\'t supported.');
                         return;
                     }
@@ -45,6 +46,7 @@
                     }
 
                     if (!('PushManager' in window)) {
+                        this.pushNotificationsUnsupported = true;
                         console.warn('Push Messaging isn\'t supported.');
                         return;
                     }
