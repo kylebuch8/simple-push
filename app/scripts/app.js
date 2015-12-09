@@ -11,7 +11,7 @@
     };
 
     if ('serviceWorker' in navigator) {
-        navigator.serviceWorker.register('/service-worker.js').then(function () {}, function (err) {
+        navigator.serviceWorker.register('../service-worker.js').then(function () {}, function (err) {
             console.warn('Service workers aren\'t supported in this browser.');
             console.log(err);
         });
