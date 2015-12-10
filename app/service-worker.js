@@ -20,14 +20,15 @@ self.addEventListener('push', function (event) {
             return self.registration.showNotification(json.title, {
                 body: json.body,
                 icon: json.icon,
-                tag: json.tag
+                tag: json.tag,
+                data: json
             });
         })
     );
 });
 
 self.addEventListener('notificationclick', function (event) {
-    var url = 'https://access.redhat.com/security/vulnerabilities/2059393';
+    var url = event.notification.data.url || 'https://access.redhat.com/';
 
     event.notification.close();
     console.log('Notification click: tag ', event.notification.tag);
