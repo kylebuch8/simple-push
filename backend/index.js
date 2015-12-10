@@ -38,6 +38,11 @@ function sendMessage(message, registrationIds) {
 
 subscriptionsRef.once('value', function (snapshot) {
     var message = new gcm.Message({
+        data: {
+            title: 'Hello from Data!',
+            body: 'Web Push Notifications are GRRRREAT!!!',
+            icon: 'images/touch/chrome-touch-icon-192x192.png'
+        },
         notification: {
             title: 'Hello!',
             body: 'Web Push Notifications are GRRRREAT!!!'

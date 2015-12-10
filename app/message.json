@@ -1,0 +1,6 @@
+{
+    "title": "Security Vulnerability",
+    "body": "Apache commons-collections: Remote code execution during deserialisation (CVE 2015-7501)",
+    "tag": "security-tag",
+    "icon": "images/touch/chrome-touch-icon-192x192.png"
+}

@@ -14,9 +14,14 @@ self.addEventListener('push', function (event) {
     var title = 'Security Vulnerability';
 
     event.waitUntil(
-        self.registration.showNotification(title, {
-            body: 'Apache commons-collections: Remote code execution during deserialisation (CVE 2015-7501)',
-            tag: 'my-tag'
+        fetch('message.json').then(function (response) {
+            return response.json();
+        }).then(function (json) {
+            return self.registration.showNotification(json.title, {
+                body: json.body,
+                icon: json.icon,
+                tag: json.tag
+            });
         })
     );
 });
