@@ -1,5 +1,6 @@
 <link rel="import" href="../../bower_components/polymer/polymer.html">
 <link rel="import" href="../../bower_components/paper-toggle-button/paper-toggle-button.html">
+<link rel="import" href="../firebase-element/firebase-element.html">
 
 <dom-module is="pn-settings">
     <template>
@@ -21,6 +22,8 @@
         var ENABLE_PUSH_MESSAGES_TEXT = 'Enable Push Notifications';
         var DISABLE_PUSH_MESSAGES_TEXT = 'Disable Push Notifications';
         var isPushEnabled = false;
+        var ref = new Firebase('https://simplepush.firebaseio.com/');
+        var subscriptionsRef = ref.child('subscriptions');
 
         Polymer({
             is: 'pn-settings',
@@ -95,7 +98,9 @@
                          * send the subscription to the server and save it to send
                          * a push notification at a later date
                          */
-                        // return sendSubscriptionToServer(subscription);
+                        subscriptionsRef.push().set({
+                            endpoint: subscription.endpoint
+                        });
                     }).catch(function (e) {
                         if (Notification.permission === 'denied') {
                             /*
@@ -145,7 +150,9 @@
                          * from the database which will prevent us from sending
                          * messages to a user who has unsubscribed
                          */
-                        // sendUnsubscribeToServer(subscription);
+                        subscriptionsRef.orderByChild('endpoint').equalTo(subscription.endpoint).on('child_added', function (snapshot) {
+                            subscriptionsRef.child(snapshot.key()).set(null);
+                        });
 
                         /*
                          * we have a subscription so call unsubscribe on it

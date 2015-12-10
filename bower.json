@@ -24,6 +24,7 @@
     "paper-menu": "PolymerElements/paper-menu#~1.2.0",
     "neon-animation": "PolymerElements/neon-animation#~1.0.8",
     "paper-toggle-button": "PolymerElements/paper-toggle-button#~1.0.11",
-    "paper-scroll-header-panel": "PolymerElements/paper-scroll-header-panel#~1.0.12"
+    "paper-scroll-header-panel": "PolymerElements/paper-scroll-header-panel#~1.0.12",
+    "firebase": "~2.3.2"
   }
 }
