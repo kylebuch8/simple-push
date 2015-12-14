@@ -30,24 +30,26 @@ self.addEventListener('notificationclick', function (event) {
     var url = event.notification.data.url || 'https://access.redhat.com/';
 
     event.notification.close();
-    console.log('Notification click: tag ', event.notification.tag);
 
     event.waitUntil(
         clients.matchAll({
             type: 'window'
         }).then(function (windowClients) {
-            var i = 0,
-                length = windowClients.length;
-
-            for (i; i < length; i += 1) {
-                var client = windowClients[i];
-                if (client.url === url && 'focus' in client) {
-                    return client.focus();
-                }
-
-                if (clients.openWindow) {
-                    return clients.openWindow(url);
-                }
+            // var i = 0,
+            //     length = windowClients.length;
+            //
+            // for (i; i < length; i += 1) {
+            //     var client = windowClients[i];
+            //     if (client.url === url && 'focus' in client) {
+            //         return client.focus();
+            //     }
+            //
+            //     if (clients.openWindow) {
+            //         return clients.openWindow(url);
+            //     }
+            // }
+            if (clients.openWindow) {
+                return clients.openWindow(url);
             }
         })
     );
