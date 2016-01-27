@@ -1,55 +1,19 @@
 var config = require('./config');
 var Firebase = require('firebase');
-var gcm = require('node-gcm');
+var webPush = require('web-push');
 var subscriptionsRef = new Firebase(config.firebaseRef);
 var q = require('q');
 var GCM_API_KEY = config.gcmApiKey;
-var sender = new gcm.Sender(GCM_API_KEY);
 
-function extractRegistrationId(endpoint) {
-    var registrationId;
+webPush.setGCMAPIKey(GCM_API_KEY);
 
-    if (endpoint.startsWith('https://android.googleapis.com/gcm/send')) {
-        var endpointParts = endpoint.split('/');
-        registrationId = endpointParts[endpointParts.length - 1];
-    }
-
-    return registrationId;
-}
-
-function sendMessage(message, registrationIds) {
-    var deferred = q.defer();
-
-    sender.send(message, {
-        registrationTokens: registrationIds
-    }, function (err, response) {
-        if (err) {
-            console.error(err);
-            deferred.reject(err);
-            return;
-        }
-
-        console.log(response);
-        deferred.resolve(response);
-    });
-
-    return deferred.promise;
+function sendMessage(endpoint) {
+    return webPush.sendNotification(endpoint);
 }
 
 subscriptionsRef.once('value', function (snapshot) {
-    var message = new gcm.Message({
-        data: {
-            title: 'Hello from Data!',
-            body: 'Web Push Notifications are GRRRREAT!!!',
-            icon: 'images/touch/chrome-touch-icon-192x192.png'
-        },
-        notification: {
-            title: 'Hello!',
-            body: 'Web Push Notifications are GRRRREAT!!!'
-        }
-    });
     var subscriptions = snapshot.val();
-    var registrationIds = [];
+    var promises = [];
 
     if (!snapshot.numChildren()) {
         process.exit();
@@ -57,16 +21,12 @@ subscriptionsRef.once('value', function (snapshot) {
 
     Object.keys(subscriptions).forEach(function (key) {
         var subscription = subscriptions[key];
-        var registrationId = extractRegistrationId(subscription.endpoint);
 
-        registrationIds.push(registrationId);
+        promises.push(sendMessage(subscription.endpoint));
     });
 
-    if (registrationIds.length) {
-        sendMessage(message, registrationIds).finally(function () {
-            process.exit();
-        });
-    } else {
+    q.all(promises).then(function () {
+        console.log('All Done!');
         process.exit();
-    }
+    });
 });
